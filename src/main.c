@@ -38,7 +38,7 @@ int _main() {
 	InitOSFunctionPointers();
 	InitVPadFunctionPointers();
 	memoryInitialize();
-	
+
 	_osscreeninit();
 	//Game Loop
 	while(1) {
@@ -99,7 +99,7 @@ void drawPixel(int x, int y, char r, char g, char b, char a) {
 	uint32_t num = (r << 24) | (g << 16) | (b << 8) | a;
 	OSScreenPutPixelEx(0,x,y,num);
 	OSScreenPutPixelEx(1,x,y,num);
-} 
+}
 void drawCircle(int x0, int y0, int radius) { //code for circles from Wikipedia
   int x = radius;
   int y = 0;
@@ -134,11 +134,11 @@ void drawRectangle(int x0, int y0, int x1, int y1) { //draw a simple Shape by 4 
 	drawLine(x1, y0, x0, y0);
 }
 void drawLine(int x0, int y0, int x1, int y1) {
- 
+
   int dx = absu(x1-x0), sx = x0<x1 ? 1 : -1;
-  int dy = absu(y1-y0), sy = y0<y1 ? 1 : -1; 
+  int dy = absu(y1-y0), sy = y0<y1 ? 1 : -1;
   int err = (dx>dy ? dx : -dy)/2, e2;
- 
+
   for(;;){
     drawPixel(x0,y0, 255, 255, 255, 1);
     if (x0==x1 && y0==y1) break;
@@ -195,7 +195,7 @@ void welcomescreen() {
 		}
 	}
 }
-void mainscreen_two() { //2 Players game
+void mainscreen_two() { // 1 Player game
 	//TODO: USE ARRAY INSTEAD OF INTs and solve array compilation problem
 	//int board[] = {2,2,2,2,2,2,2,2,2} --> loader.c:(.text+0xde8): undefined reference to `memcpy'
 	reset_game();
@@ -238,47 +238,129 @@ void mainscreen_two() { //2 Players game
 	sleep(5);
 }
 void player_turn(int player){ //require input from human player(s)
-	while(1) {
-		VPADRead(0, &vpad_data, 1, &error); //Read the vpaddata
-		
-		//check home VPAD_BUTTON
-		if (vpad_data.btns_h & VPAD_BUTTON_HOME) { //check if we should exit from application
-			exitCheck = true;
-			return;
+	if (player == 0) { // AI player
+		int madeMove = 0;
+		int pl = player; // Shorthand version
+
+		// If player has two in a row, win:
+		if(b5==pl) {
+			if(madeMove==0 && b1==pl && b9==2) { b9=player; madeMove=1; }
+			if(madeMove==0 && b2==pl && b8==2) { b8=player; madeMove=1; }
+			if(madeMove==0 && b3==pl && b7==2) { b7=player; madeMove=1; }
+			if(madeMove==0 && b4==pl && b6==2) { b6=player; madeMove=1; }
+			if(madeMove==0 && b6==pl && b4==2) { b4=player; madeMove=1; }
+			if(madeMove==0 && b7==pl && b3==2) { b3=player; madeMove=1; }
+			if(madeMove==0 && b8==pl && b2==2) { b2=player; madeMove=1; }
+			if(madeMove==0 && b9==pl && b1==2) { b1=player; madeMove=1; }
 		}
-		
-		//touch code
-		if (vpad_data.tpdata.touched == 1) {
-			if (vpad_data.tpdata.x > 422 && vpad_data.tpdata.x < 800) { //first column
-				if (vpad_data.tpdata.y > 2418 && vpad_data.tpdata.y < 3122) { //first row
-					if (b1==2) {b1=player; break;}
-				} else if (vpad_data.tpdata.y > 1754 && vpad_data.tpdata.y < 2418) { //second row
-					if (b4==2) {b4=player; break;}
-				} else if (vpad_data.tpdata.y > 1068 && vpad_data.tpdata.y < 1754) { //third row
-					if (b7==2) {b7=player; break;}
-				}
-			} else if (vpad_data.tpdata.x > 800 && vpad_data.tpdata.x < 1186) { //second column
-				if (vpad_data.tpdata.y > 2418 && vpad_data.tpdata.y < 3122) { //first row
-					if (b2==2) {b2=player; break;}
-				} else if (vpad_data.tpdata.y > 1754 && vpad_data.tpdata.y < 2418) { //second row
-					if (b5==2) {b5=player; break;}
-				} else if (vpad_data.tpdata.y > 1068 && vpad_data.tpdata.y < 1754) { //third row
-					if (b8==2) {b8=player; break;}
-				}
-			} else if (vpad_data.tpdata.x > 1186 && vpad_data.tpdata.x <= 1578) { //third column
-				if (vpad_data.tpdata.y > 2418 && vpad_data.tpdata.y < 3122) { //first row
-					if (b3==2) {b3=player; break;}
-				} else if (vpad_data.tpdata.y > 1754 && vpad_data.tpdata.y < 2418) { //second row
-					if (b6==2) {b6=player; break;}
-				} else if (vpad_data.tpdata.y > 1068 && vpad_data.tpdata.y < 1754) { //third row
-					if (b9==2) {b9=player; break;}
-				}
+		if(madeMove==0 && b2==pl) {
+			if(madeMove==0 && b1==pl && b3==2) { b3=player; madeMove=1; }
+			if(madeMove==0 && b3==pl && b1==2) { b1=player; madeMove=1; }
+		}
+		if(madeMove==0 && b8==pl) {
+			if(madeMove==0 && b7==pl && b9==2) { b9=player; madeMove=1; }
+			if(madeMove==0 && b9==pl && b7==2) { b7=player; madeMove=1; }
+		}
+		if(madeMove==0 && b4==pl) {
+			if(madeMove==0 && b1==pl && b7==2) { b7=player; madeMove=1; }
+			if(madeMove==0 && b7==pl && b1==2) { b1=player; madeMove=1; }
+		}
+		if(madeMove==0 && b6==pl) {
+			if(madeMove==0 && b3==pl && b9==2) { b9=player; madeMove=1; }
+			if(madeMove==0 && b9==pl && b3==2) { b3=player; madeMove=1; }
+		}
+
+		// If opponent has two in a row, block:
+		if(b5==1-pl) {
+			if(madeMove==0 && b1==1-pl && b9==2) { b9=player; madeMove=1; }
+			if(madeMove==0 && b2==1-pl && b8==2) { b8=player; madeMove=1; }
+			if(madeMove==0 && b3==1-pl && b7==2) { b7=player; madeMove=1; }
+			if(madeMove==0 && b4==1-pl && b6==2) { b6=player; madeMove=1; }
+			if(madeMove==0 && b6==1-pl && b4==2) { b4=player; madeMove=1; }
+			if(madeMove==0 && b7==1-pl && b3==2) { b3=player; madeMove=1; }
+			if(madeMove==0 && b8==1-pl && b2==2) { b2=player; madeMove=1; }
+			if(madeMove==0 && b9==1-pl && b1==2) { b1=player; madeMove=1; }
+		}
+		if(madeMove==0 && b2==1-pl) {
+			if(madeMove==0 && b1==1-pl && b3==2) { b3=player; madeMove=1; }
+			if(madeMove==0 && b3==1-pl && b1==2) { b1=player; madeMove=1; }
+		}
+		if(madeMove==0 && b8==1-pl) {
+			if(madeMove==0 && b7==1-pl && b9==2) { b9=player; madeMove=1; }
+			if(madeMove==0 && b9==1-pl && b7==2) { b7=player; madeMove=1; }
+		}
+		if(madeMove==0 && b4==1-pl) {
+			if(madeMove==0 && b1==1-pl && b7==2) { b7=player; madeMove=1; }
+			if(madeMove==0 && b7==1-pl && b1==2) { b1=player; madeMove=1; }
+		}
+		if(madeMove==0 && b6==1-pl) {
+			if(madeMove==0 && b3==1-pl && b9==2) { b9=player; madeMove=1; }
+			if(madeMove==0 && b9==1-pl && b3==2) { b3=player; madeMove=1; }
+		}
+
+		// Play center if possible
+		if(madeMove==0 && b5==2) { b5=player; madeMove=1; }
+
+		// Opposite corner
+		if(madeMove==0 && b1==1-pl && b9==2) { b9=player; madeMove=1; }
+		if(madeMove==0 && b9==1-pl && b1==2) { b1=player; madeMove=1; }
+		if(madeMove==0 && b3==1-pl && b7==2) { b7=player; madeMove=1; }
+		if(madeMove==0 && b7==1-pl && b3==2) { b3=player; madeMove=1; }
+
+		// Empty corner
+		if(madeMove==0 && b1==2) { b1=player; madeMove=1; }
+		if(madeMove==0 && b3==2) { b3=player; madeMove=1; }
+		if(madeMove==0 && b7==2) { b7=player; madeMove=1; }
+		if(madeMove==0 && b9==2) { b9=player; madeMove=1; }
+
+		// Empty side
+		if(madeMove==0 && b2==2) { b2=player; madeMove=1; }
+		if(madeMove==0 && b4==2) { b4=player; madeMove=1; }
+		if(madeMove==0 && b6==2) { b6=player; madeMove=1; }
+		if(madeMove==0 && b8==2) { b8=player; madeMove=1; }
+	} else {
+		while(1) {
+			VPADRead(0, &vpad_data, 1, &error); //Read the vpaddata
+
+			//check home VPAD_BUTTON
+			if (vpad_data.btns_h & VPAD_BUTTON_HOME) { //check if we should exit from application
+				exitCheck = true;
+				return;
 			}
-			unsigned int t1 = 0x500000; //wait between checks
-			while(t1--) ;
+
+			//touch code
+			if (vpad_data.tpdata.touched == 1) {
+				if (vpad_data.tpdata.x > 422 && vpad_data.tpdata.x < 800) { //first column
+					if (vpad_data.tpdata.y > 2418 && vpad_data.tpdata.y < 3122) { //first row
+						if (b1==2) {b1=player; break;}
+					} else if (vpad_data.tpdata.y > 1754 && vpad_data.tpdata.y < 2418) { //second row
+						if (b4==2) {b4=player; break;}
+					} else if (vpad_data.tpdata.y > 1068 && vpad_data.tpdata.y < 1754) { //third row
+						if (b7==2) {b7=player; break;}
+					}
+				} else if (vpad_data.tpdata.x > 800 && vpad_data.tpdata.x < 1186) { //second column
+					if (vpad_data.tpdata.y > 2418 && vpad_data.tpdata.y < 3122) { //first row
+						if (b2==2) {b2=player; break;}
+					} else if (vpad_data.tpdata.y > 1754 && vpad_data.tpdata.y < 2418) { //second row
+						if (b5==2) {b5=player; break;}
+					} else if (vpad_data.tpdata.y > 1068 && vpad_data.tpdata.y < 1754) { //third row
+						if (b8==2) {b8=player; break;}
+					}
+				} else if (vpad_data.tpdata.x > 1186 && vpad_data.tpdata.x <= 1578) { //third column
+					if (vpad_data.tpdata.y > 2418 && vpad_data.tpdata.y < 3122) { //first row
+						if (b3==2) {b3=player; break;}
+					} else if (vpad_data.tpdata.y > 1754 && vpad_data.tpdata.y < 2418) { //second row
+						if (b6==2) {b6=player; break;}
+					} else if (vpad_data.tpdata.y > 1068 && vpad_data.tpdata.y < 1754) { //third row
+						if (b9==2) {b9=player; break;}
+					}
+				}
+				unsigned int t1 = 0x500000; //wait between checks
+				while(t1--) ;
+			}
 		}
 	}
-	update_board(absu(player-1)); //update the 
+	update_board(absu(player-1)); //update the
 	flipBuffers(); //
 	unsigned int t1 = 0x5000000;
 	while(t1--) ;
@@ -295,7 +377,7 @@ void update_board(int player) { //Updates the current TicTac Toe game with playe
 	} else if (player==1) {
 		drawString(40,7,"X turn");
 	}
-	
+
 	//TEMP CODE; TO SWITCH TO ARRAY
 	if (b1==0) {drawCircle(113, 147, 20);} else if (b1==1) {drawCross(93, 127);}
 	if (b2==0) {drawCircle(198, 147, 20);} else if (b2==1) {drawCross(178, 127);}
